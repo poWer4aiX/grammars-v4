@@ -1576,12 +1576,15 @@ alterUser
         (WITH userResourceOption+)?
         (userPasswordOption | userLockOption)*
         (COMMENT STRING_LITERAL |  ATTRIBUTE STRING_LITERAL)?       #alterUserMysqlV80
+    | ALTER USER ifExists?
+      (userName | uid) DEFAULT ROLE roleOption                      #alterUserMysqlV80
     ;
 
 createUser
     : CREATE USER userAuthOption (',' userAuthOption)*              #createUserMysqlV56
     | CREATE USER ifNotExists?
         userAuthOption (',' userAuthOption)*
+        (DEFAULT ROLE roleOption)?
         (
           REQUIRE
           (tlsNone=NONE | tlsOption (AND? tlsOption)* )
@@ -1638,7 +1641,7 @@ revokeStatement
       FROM userName (',' userName)*                                 #detailRevoke
     | REVOKE ALL PRIVILEGES? ',' GRANT OPTION
       FROM userName (',' userName)*                                 #shortRevoke
-    | REVOKE uid (',' uid)*
+    | REVOKE (userName | uid) (',' (userName | uid))*
       FROM (userName | uid) (',' (userName | uid))*                 #roleRevoke
     ;
 
